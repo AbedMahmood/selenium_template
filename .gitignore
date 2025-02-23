@@ -1,0 +1,53 @@
+# Byte-compiled Python files
+*__pycache__/
+*.pytest_cache/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+
+# Python dependencies
+*.egg-info/
+dist/
+build/
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# IDE/editor config files
+.vscode/
+.idea/
+*.iml
+
+# Environment variables
+.env
+*.pem
+config.json
+
+# Java build files
+*.class
+*.jar
+*.war
+*.ear
+target/
+bin/
+
+# Maven and Gradle
+.mvn/
+.gradle/
+!gradle-wrapper.jar
+
+# Selenium-specific files
+test-reports/
+screenshots/
+
+# Misc
+.DS_Store
+Thumbs.db
+
+# Custom
+reports/
+script.py
