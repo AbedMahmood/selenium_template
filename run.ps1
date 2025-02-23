@@ -29,7 +29,7 @@ function Run-PythonTests($testFiles, $baseDir, $reportsDir) {
 
             if (Test-Path $absoluteTestFile) {
                 Write-Host "Running test: $absoluteTestFile"
-                
+ 
                 # Define report filenames
                 $reportFile = Join-Path $reportsDir "${testName}_report.xml"
                 $htmlReportFile = Join-Path $reportsDir "${testName}_report.html"
