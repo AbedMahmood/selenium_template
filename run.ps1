@@ -12,17 +12,33 @@ $javaTestFiles = $changedFiles | Where-Object { $_ -like "java/src/test/java/tes
 $pythonBaseDir = Join-Path $scriptDir "python"
 $javaBaseDir = Join-Path $scriptDir "java"
 
-# Function to run Python tests
-function Run-PythonTests($testFiles, $baseDir) {
+# Ensure reports directory exists
+$reportsDir = Join-Path $scriptDir "reports"
+if (!(Test-Path $reportsDir)) {
+    New-Item -ItemType Directory -Path $reportsDir
+}
+
+# Function to run Python tests and generate reports
+function Run-PythonTests($testFiles, $baseDir, $reportsDir) {
     if ($testFiles.Count -gt 0) {
         Write-Host "Running Python tests for the following files:"
         foreach ($testFile in $testFiles) {
             $relativeTestFile = $testFile -replace "^python/", ""
             $absoluteTestFile = Join-Path $baseDir $relativeTestFile
+            $testName = [System.IO.Path]::GetFileNameWithoutExtension($absoluteTestFile)
 
             if (Test-Path $absoluteTestFile) {
                 Write-Host "Running test: $absoluteTestFile"
-                pytest $absoluteTestFile
+                
+                # Define report filenames
+                $reportFile = Join-Path $reportsDir "${testName}_report.xml"
+                $htmlReportFile = Join-Path $reportsDir "${testName}_report.html"
+
+                # Run pytest with JUnit XML report
+                pytest $absoluteTestFile --junitxml=$reportFile
+
+                # Convert XML report to HTML
+                junit2html $reportFile $htmlReportFile
             } else {
                 Write-Host "Test file not found: $absoluteTestFile"
             }
@@ -33,7 +49,7 @@ function Run-PythonTests($testFiles, $baseDir) {
 }
 
 # Function to run Java tests
-function Run-JavaTests($testFiles) {
+function Run-JavaTests($testFiles, $reportsDir) {
     if ($testFiles.Count -gt 0) {
         Write-Host "Running Java tests for the following files:"
         $testClasses = @()
@@ -42,20 +58,20 @@ function Run-JavaTests($testFiles) {
             $testClasses += $className
             Write-Host "Will run test: $className"
         }
- 
+
         $testClassesString = $testClasses -join ","
- 
+
         # Change to the Java project directory
         Push-Location -Path (Join-Path $scriptDir "java")
- 
+
         # Run Maven clean install with specific test classes, properly escaped
         $mvnCommand = "mvn clean install '-Dtest=$testClassesString'"
         Write-Host "Executing: $mvnCommand"
         Invoke-Expression $mvnCommand
- 
+
         # Change back to the original directory after Maven finishes
         Pop-Location
- 
+
         # Ensure we're back in the original script directory (selenium_template)
         Set-Location -Path $scriptDir
     } else {
@@ -63,9 +79,8 @@ function Run-JavaTests($testFiles) {
     }
 }
 
-
-# Run Python tests
-Run-PythonTests $pythonTestFiles $pythonBaseDir
+# Run Python tests and generate reports
+Run-PythonTests $pythonTestFiles $pythonBaseDir $reportsDir
 
 # Run Java tests
-Run-JavaTests $javaTestFiles
+Run-JavaTests $javaTestFiles $reportsDir
