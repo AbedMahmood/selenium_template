@@ -9,7 +9,9 @@ These are barebone projects, initial setup is complete, extend the project to su
 
 ### Continuous Integration
 
-> .\run.ps1
+> cd selenium_template
+
+> .\run_tests.ps1
 
 #### Running the application
 
@@ -25,7 +27,7 @@ These are barebone projects, initial setup is complete, extend the project to su
 
 > pip install -r requirements.txt
 
-> .\run_tests.ps1
+> pytest --junitxml=reports/report.xml
 
 3) Java 
 

@@ -12,10 +12,16 @@ $javaTestFiles = $changedFiles | Where-Object { $_ -like "java/src/test/java/tes
 $pythonBaseDir = Join-Path $scriptDir "python"
 $javaBaseDir = Join-Path $scriptDir "java"
 
-# Ensure reports directory exists
-$reportsDir = Join-Path $scriptDir "reports"
-if (!(Test-Path $reportsDir)) {
-    New-Item -ItemType Directory -Path $reportsDir
+# Ensure reports directories exist
+$pythonReportsDir = Join-Path $pythonBaseDir "reports"
+$javaReportsDir = Join-Path $javaBaseDir "reports"
+
+if (!(Test-Path $pythonReportsDir)) {
+    New-Item -ItemType Directory -Path $pythonReportsDir
+}
+
+if (!(Test-Path $javaReportsDir)) {
+    New-Item -ItemType Directory -Path $javaReportsDir
 }
 
 # Function to run Python tests and generate reports
@@ -72,15 +78,15 @@ function Run-JavaTests($testFiles, $reportsDir) {
         # Change back to the original directory after Maven finishes
         Pop-Location
 
-        # Ensure we're back in the original script directory (selenium_template)
+        # Ensure we're back in the original script directory
         Set-Location -Path $scriptDir
     } else {
         Write-Host "No Java test files were modified. Skipping Java test run."
     }
 }
 
-# Run Python tests and generate reports
-Run-PythonTests $pythonTestFiles $pythonBaseDir $reportsDir
+# Run Python tests and generate reports inside python/reports
+Run-PythonTests $pythonTestFiles $pythonBaseDir $pythonReportsDir
 
-# Run Java tests
-Run-JavaTests $javaTestFiles $reportsDir
+# Run Java tests and generate reports inside java/reports
+Run-JavaTests $javaTestFiles $javaReportsDir
